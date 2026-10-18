@@ -21,3 +21,5 @@
 - Pereira lookup uses fixed official Socrata endpoints, explicit CIIU categories and published municipality coverage; combined categories stay uncertain and BIC registration never implies active status — enables independent business discovery without fabricated geography, industry or contacts.
 
 - External delivery uses Nitro Vercel and src/lib/backend auth, without the Lovable OAuth broker — preserves session-scoped RLS and CSRF on the user-owned backend.
+
+- Public welcome/account screens use email auth with bounded name/company profiles; phone access is deployment-gated until an SMS provider exists — preserves private leads and avoids unsupported-provider claims.

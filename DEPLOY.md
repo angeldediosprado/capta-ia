@@ -11,9 +11,9 @@ Esto conserva el repositorio y su historial; no requiere crear otro ni hacer for
 ## 2. Preparar tu proyecto propio de Supabase
 En tu proyecto EXTERNO, abre SQL Editor y ejecuta UNA VEZ el archivo `drizzle/migrations/0000_prospecting_workspace.sql`. Está diseñado para un proyecto sin esa tabla y función. Si ya existen, no lo ejecutes a ciegas: primero compara la estructura.
 
-En Authentication → Sign In / Providers activa Google y configura el cliente OAuth de Google. Usa la URL de callback que muestre TU proyecto de Supabase en la configuración de Google. No copies URLs del proyecto de Lovable.
+En Authentication → Sign In / Providers activa Email. Mantén Confirm email activado. Ejecuta UNA VEZ `drizzle/migrations/0001_account_profiles.sql` para guardar nombre y empresa; si ya existe profiles, revisa antes su estructura. Este SQL es para tu proyecto externo, no se aplica automáticamente desde Lovable.
 
-Esta versión ofrece Google. El acceso con Lovable no se transfiere. No hay registro anónimo ni confirmación automática de correo.
+Esta versión ofrece correo + contraseña, incluidos Gmail e iCloud como direcciones de correo. No son botones OAuth de Google/Apple. Google no es obligatorio. Para teléfono: activa Phone y configura un proveedor SMS en tu proyecto externo (con costo y límites); solo después añade VITE_PHONE_AUTH_ENABLED=true en Vercel y haz Redeploy. Sin proveedor, teléfono se muestra como no disponible. No hay registro anónimo ni confirmación automática de correo.
 
 ## 3. Importar en Vercel
 Add New → Project → importa `angeldediosprado/capta-ia`.
@@ -37,11 +37,11 @@ No se necesita service_role ni contraseña de base de datos para esta app. NUNCA
 Pulsa Deploy. Las variables VITE_ se incorporan al compilar: si las cambias, pulsa Redeploy.
 
 ## 4. Autorizar la dirección publicada
-Copia la URL que dé Vercel. En TU Supabase → Authentication → URL Configuration, establece Site URL y añade esa dirección exacta (origen, sin rutas privadas) a Redirect URLs. Autoriza por separado las direcciones Preview necesarias; no abras comodines generales innecesarios.
+Copia la URL que dé Vercel. En TU Supabase → Authentication → URL Configuration, establece Site URL y añade el origen y también las direcciones exactas terminadas en /auth y /reset-password a Redirect URLs. Autoriza por separado las direcciones Preview necesarias; no abras comodines generales innecesarios.
 
 ## 5. Verificar antes de anunciarla
 1. Abre Inicio y Reportes; comprueba las imágenes y navegación al refrescar cada dirección.
-2. Entra con Google y selecciona Workspace real.
+2. Crea una cuenta con correo, confirma el enlace recibido y entra con correo y contraseña y selecciona Workspace real.
 3. Busca fuentes con el perfil provisional; comprueba registros y auditoría, y recarga para comprobar que se guardaron.
 4. Prueba CSV, borrador manual y exportación del inventario.
 5. En una segunda cuenta, confirma que no ve los datos privados de la primera.
@@ -55,7 +55,10 @@ Copia la URL que dé Vercel. En TU Supabase → Authentication → URL Configura
 - Lovable Cloud no se desconecta del proyecto del editor. Esta es una copia externa independiente.
 
 ## Verificación del paquete
-84 pruebas aprobadas. Compilación externa Vercel aprobada: genera `.vercel/output` con funciones y archivos estáticos. Se usaron valores públicos ficticios exclusivamente para compilar, NO incluidos en la entrega. No se comprobó inicio de sesión, guardado ni consulta en TU Supabase/Vercel: requiere su configuración y el primer despliegue. No se ha subido código a GitHub ni publicado desde esta entrega.
+88 pruebas aprobadas. Compilación externa Vercel aprobada: genera `.vercel/output` con funciones y archivos estáticos. Se usaron valores públicos ficticios exclusivamente para compilar, NO incluidos en la entrega. No se comprobó inicio de sesión, guardado ni consulta en TU Supabase/Vercel: requiere su configuración y el primer despliegue. No se ha subido código a GitHub ni publicado desde esta entrega.
 
 ## Búsqueda a comprobar tras actualizar
 En Fuentes selecciona Restaurantes, Colombia y Bogotá. En Dónde buscar elige Turismo Colombia, acepta las condiciones y pulsa Buscar empresas. Comprueba los contactos en Empresas y recarga para confirmar el guardado. Para probar las dos fuentes juntas, busca restaurantes en Pereira y selecciona Turismo Colombia y Cámara de Pereira. El requisito 1 fue verificado aquí para ese piloto (24 + 16 registros); falta comprobarlo en tu Vercel. No se promete segunda fuente de Bogotá ni cobertura universal.
+
+## Límites verificados de esta entrega
+Bienvenida con logo facetado y Manrope, animación con movimiento reducido, formulario y errores verificados en escritorio y móvil. Sesión existente: búsqueda de 40 empresas en dos fuentes y cierre de sesión comprobados aquí. Alta por correo/confirmación y entrega SMS NO verificados: el servicio de registro de preview rechazó la cuenta de prueba. Confirma registro, recepción de email, perfil creado, recuperación y acceso en tu proyecto externo antes de anunciar que funcionan. Configura SMTP para entrega de correo de producción.

@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          company: string
+          created_at: string
+          display_name: string
+          id: string
+        }
+        Insert: {
+          company?: string
+          created_at?: string
+          display_name?: string
+          id: string
+        }
+        Update: {
+          company?: string
+          created_at?: string
+          display_name?: string
+          id?: string
+        }
+        Relationships: []
+      }
       prospecting_workspaces: {
         Row: {
           payload: Json

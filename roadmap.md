@@ -1,9 +1,17 @@
 # Functional vertical slice
+## Welcome and non-Google account access
+- [x] Prepare Vercel v3 delivery with profiles SQL and email/SMS setup instructions; 88 external tests and external build pass. Transfer and external settings are user-managed.
+- [ ] Activate phone delivery: UI/code provided, deployment-gated off until user configures paid SMS provider and verifies OTP. Gmail/iCloud work as email addresses, not OAuth buttons.
+- [x] Emphasize approved faceted logo and Manrope typography; concise audience/value and Scout/Sorter/Check context, desktop/mobile inspected.
+- [x] Show the user the new welcome in the live preview (Inicio).
+- [x] Create animated public welcome with account invitation and reduced-motion support.
+- [x] Add email/password access and name/company profiles with owner-only policies and signup trigger; Cloud email enabled; external email settings need user configuration.
+- [ ] Verify new-account confirmation and profile trigger end-to-end: preview signup rejected test registration (400); existing-session two-source search, signout and error states verified. External auth settings/SMTP remain unverified.
 ## Useful prospect discovery
 - [x] Current request: connect and verify independent Cámara de Pereira + RNT in the same real restaurant search (Pereira): 16 + 24 records, 40 ICP matches, both successful, persisted after reload; prepare updated Vercel source. External transfer/deployment remains user-managed.
 - [x] Connect useful RNT public/free lookup: actual signed-in Bogotá restaurant search returned 100 contactable establishments, 86 ICP matches and 10 with retained role-based business email plus phone/address; repeat lookup did not add duplicates and restaurant remained visible after reload. Covers registered Colombian restaurants/hotels only, latest published period; no universal or marketing-consent claim. Costs remain N/D until recorded. Not transferred to Vercel.
 - [x] Useful second-source pilot: Cámara de Pereira BIC dataset hjhn-23mx, free public API and CC BY-SA 4.0 confirmed; 16 Pereira restaurants with published business phone in real authenticated combined search. Not all businesses, no current-active claim. Bogotá second-source coverage remains unverified; DENUE requires token and paid sources require opt-in.
-- [x] Recheck Bogotá restaurants signed-in: both fixed global map instances remain unavailable. Added bounded alternate transport with no rate-limit evasion, no partial/synthetic fallback and clear error; 64 tests pass, automatic build OK. Requirement 1 remains blocked, not completed.
+- [x] Recheck Bogotá restaurants signed-in: both fixed global map instances remain unavailable. Bounded transport preserves honest failure; RNT and Cámara de Pereira subsequently verified requirement 1 for the Pereira pilot.
 - [ ] Verify a useful independent second source: Bogotá IDT tourism GIS timed out and contact fields are unverified; Maicao/Calima APIs have different coverage and must not be shown as Bogotá results. A paid provider requires explicit user authorization/account/budget and cannot substitute for the two-free-source requirement.
 - [x] Requirement 1 pilot evidence ready to report: two independent free sources returned useful restaurants in Pereira, 40 records, successful saved audits and reload. Do not claim general Bogotá/US/LatAm coverage or externally deployed readiness.
 - [x] Resolve Bogotá/Bogota through Nominatim's verified city relation 7426387, avoiding the incorrect exact boundary name. Preserve geographic area evidence separately from postal city; failures remain errors and retry stays visible.
@@ -32,7 +40,7 @@
 - [ ] Verify external sign-in, private workspace persistence and DataSF on the deployed site.
 - [ ] After first deployment, simplify unused features and hard-to-understand text.
 ## Remaining external blockers
-- [ ] Second-source evidence: replace the CSLB file dependency with a verified public/free lookup source; CSLB import can remain optional, not required.
+- [x] Second-source evidence: Cámara de Pereira replaces the file dependency for the verified Pereira restaurant pilot; CSLB stays optional.
 - [ ] Automatic Dapta/provider contact: requires endpoint, credentials, request-response contract and explicit outreach authorization.
 - [x] Public Vercel page renders at capta-ia-six.vercel.app (user screenshot); authentication, persistence and real external source flow remain unverified.
 ## Requirement-by-requirement delivery

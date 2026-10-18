@@ -5,6 +5,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
@@ -47,7 +48,9 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
+  useEffect(() => {
 
+  }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -125,17 +128,19 @@ function DataOutlet() { useDataRevision(); return <><WorkspaceBar /><Outlet /></
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const path = useRouterState({select:s=>s.location.pathname});
+  const publicPage = path==='/' || path==='/auth' || path==='/reset-password';
 
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <VisualModeProvider>
         <TooltipProvider delayDuration={150}>
-          <ClientOnly fallback={<div role="status" className="min-h-screen bg-background p-6 text-muted-foreground">Cargando workspace…</div>}><ProspectingProvider>
+          {publicPage ? <Outlet/> : <ClientOnly fallback={<div role="status" className="min-h-screen bg-background p-6 text-muted-foreground">Cargando workspace…</div>}><ProspectingProvider>
           <AppShell>
             <DataOutlet />
           </AppShell>
-          </ProspectingProvider></ClientOnly>
+          </ProspectingProvider></ClientOnly>}
           <Toaster theme="dark" />
         </TooltipProvider>
       </VisualModeProvider>

@@ -1,0 +1,23 @@
+import {useEffect,useState} from 'react';
+import {Link} from '@tanstack/react-router';
+import {ArrowRight,Search,Layers,CheckCheck} from 'lucide-react';
+import {Button} from '@/components/ui/button';
+import {Logo,LogoMark} from '@/components/brand/Logo';
+import hero from '@/assets/hero-scene.jpg';
+import {supabase} from '@/lib/backend/client';
+export function Welcome(){
+ const [signedIn,setSignedIn]=useState(false);
+ useEffect(()=>{let active=true;void supabase.auth.getUser().then(({data})=>{if(active)setSignedIn(Boolean(data.user));});return()=>{active=false;};},[]);
+ return <main className="welcome-page bg-background">
+  <header className="absolute inset-x-0 top-0 z-20 mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-6 md:px-12"><Link to="/" aria-label="capta IA inicio"><Logo/></Link><Button asChild variant="outline" className="bg-background/60"><Link to={signedIn?'/fuentes':'/auth'}>{signedIn?'Mis búsquedas':'Iniciar sesión'}<ArrowRight className="size-4"/></Link></Button></header>
+  <section className="welcome-scene relative isolate flex min-h-[38rem] items-end overflow-hidden px-6 pb-16 pt-32 md:px-12" aria-labelledby="welcome-title">
+   <img src={hero} alt="Scout, Sorter y Check, el equipo de capta IA" width={1920} height={912} className="welcome-image absolute inset-0 -z-20 h-full w-full object-cover object-[68%_50%]"/>
+   <div className="absolute inset-0 -z-10 bg-gradient-to-r from-background via-background/65 to-transparent" aria-hidden/>
+   <div className="absolute inset-0 -z-10 bg-gradient-to-t from-background via-transparent to-background/30" aria-hidden/>
+   <div className="welcome-enter mx-auto w-full max-w-7xl"><div className="max-w-xl"><p className="mb-5 text-sm font-medium text-signal">Menos ruido. Mejores prospectos.</p><h1 id="welcome-title" className="flex items-center gap-4 font-sans text-5xl font-semibold leading-tight sm:text-6xl md:text-8xl"><LogoMark className="size-14 shrink-0 md:size-24"/><span>capta <span className="text-signal">IA</span></span></h1><p className="mt-5 max-w-md text-lg leading-relaxed text-foreground/85">Encuentra empresas para tu negocio. Reúne sus contactos y decide a quién acercarte.</p><div className="mt-8 flex flex-wrap gap-3"><Button asChild size="lg"><Link to={signedIn?'/fuentes':'/auth'} search={signedIn?{}:{mode:'signup'}}>{signedIn?'Buscar empresas':'Crear mi cuenta'}<ArrowRight/></Link></Button><Button asChild variant="outline" size="lg" className="bg-background/50"><Link to="/fuentes">Ver demostración</Link></Button></div><p className="mt-4 text-xs text-muted-foreground">Con tu correo. Sin necesidad de Google.</p></div></div>
+  </section>
+  <section className="mx-auto grid max-w-7xl gap-6 px-6 py-12 md:grid-cols-2 md:px-12" aria-labelledby="why-title"><h2 id="why-title" className="max-w-md text-3xl font-semibold leading-snug">Menos tiempo buscando.<br/>Más tiempo conectando.</h2><div className="max-w-lg space-y-4 text-base leading-relaxed text-muted-foreground"><p>Para independientes, equipos comerciales y empresas que quieren encontrar a su próximo cliente, sepan o no programar.</p><p>Elige un sector y una ciudad. capta IA reúne empresas y sus contactos públicos para que puedas revisar oportunidades sin empezar desde cero.</p></div></section>
+  <section className="mx-auto max-w-7xl border-t px-6 py-12 md:px-12" aria-labelledby="team-title"><p className="mb-3 text-sm text-signal">Así trabaja capta IA</p><h2 id="team-title" className="mb-8 text-3xl font-semibold">Tres agentes. Tú decides.</h2><div className="grid gap-8 sm:grid-cols-3">{[{name:'Scout',icon:Search,text:'Busca en las fuentes disponibles y conserva de dónde viene cada empresa.'},{name:'Sorter',icon:Layers,text:'Reúne los contactos y revisa duplicados para mantener una lista ordenada.'},{name:'Check',icon:CheckCheck,text:'Aplica tu perfil de cliente y señala los datos que faltan antes de contactar.'}].map(({name,icon:Icon,text})=><div key={name} className="flex gap-4 border-t pt-5"><Icon className="mt-1 size-5 shrink-0 text-signal"/><div><h3 className="text-lg font-semibold">{name}</h3><p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">{text}</p></div></div>)}</div><p className="mt-8 max-w-2xl text-sm leading-relaxed text-muted-foreground">Puedes revisar cada resultado y su origen. Las búsquedas siguen reglas de procesamiento; no se envían mensajes automáticamente.</p></section>
+  <footer className="mx-auto flex max-w-7xl flex-wrap justify-between gap-3 px-6 py-8 text-xs text-muted-foreground md:px-12"><span>capta IA</span><span>Datos públicos de empresas. Cobertura según la fuente.</span></footer>
+ </main>;
+}

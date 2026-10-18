@@ -157,6 +157,12 @@
 .anim-float { animation: float-y 6s ease-in-out infinite; }
 .anim-pulse { animation: pulse-dot 2s ease-in-out infinite; }
 .anim-beam { animation: beam 4s ease-in-out infinite; }
+.welcome-scene { height: min(780px, 86svh); }
+.welcome-image { animation: welcome-drift 24s ease-in-out infinite alternate; }
+.welcome-enter { animation: welcome-reveal 900ms ease-out both; }
+@keyframes welcome-drift { from { transform: scale(1); } to { transform: scale(1.055) translateX(-0.6%); } }
+@keyframes welcome-reveal { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 640px) { .welcome-scene { min-height: 620px; height: 86svh; } }
 
 .perf-mode *, .perf-mode *::after, .perf-mode *::before { animation: none !important; transition: none !important; }
 @media (prefers-reduced-motion: reduce) {

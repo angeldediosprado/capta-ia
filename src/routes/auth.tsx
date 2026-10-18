@@ -1,0 +1,4 @@
+import {createFileRoute} from '@tanstack/react-router';
+import {AccountForm} from '@/components/AccountForm';
+export const Route=createFileRoute('/auth')({validateSearch:(s:Record<string,unknown>):{mode?:'signup'|'login'}=>({mode:s['mode']==='signup'?'signup' as const:'login' as const}),head:()=>({meta:[{title:'Tu cuenta — capta IA'},{name:'description',content:'Crea tu cuenta o entra con correo para buscar empresas en capta IA.'},{property:'og:title',content:'Tu cuenta — capta IA'},{property:'og:description',content:'Accede a tus búsquedas y contactos empresariales.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]}),component:Auth});
+function Auth(){const {mode}=Route.useSearch();return <AccountForm initialMode={mode??'login'}/>;}

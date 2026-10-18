@@ -16,8 +16,8 @@ export function ProspectingProvider({children}:{children:ReactNode}) {
   const apply=(email:string|null)=>{if(disposed)return;setUser(email);if(email)void load().then(r=>{if(!disposed)setProspectingData(r.workspace,r.revision);}).catch(()=>{if(!disposed)setError('No se pudieron cargar los datos guardados');});else setProspectingData(emptyWorkspace(),0,'demo');};
   const selectedMode=sessionStorage.getItem('capta-data-mode');
   if(selectedMode==='real'||selectedMode==='demo'){const current=getProspectingData();setProspectingData(current.workspace,current.revision,selectedMode);}
-  void supabase.auth.getSession().then(({data})=>apply(data.session?.user.email??null));
-  const {data}=supabase.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_UPDATED')setTimeout(()=>apply(session?.user.email??null),0);});
+  void supabase.auth.getUser().then(({data})=>apply(data.user?.email??data.user?.phone??data.user?.id??null));
+  const {data}=supabase.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_UPDATED')setTimeout(()=>apply(session?.user.email??session?.user.phone??session?.user.id??null),0);});
   return()=>{disposed=true;data.subscription.unsubscribe();};
  },[load]);
  return <Context.Provider value={{user,busy,error,refresh,save,consult,setMode:m=>{sessionStorage.setItem('capta-data-mode',m);const s=getProspectingData();setProspectingData(s.workspace,s.revision,m);}}}>{children}</Context.Provider>;

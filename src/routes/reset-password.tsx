@@ -1,0 +1,3 @@
+import {createFileRoute} from '@tanstack/react-router';
+import {AccountForm} from '@/components/AccountForm';
+export const Route=createFileRoute('/reset-password')({head:()=>({meta:[{title:'Nueva contraseña — capta IA'},{name:'description',content:'Recupera el acceso a tu cuenta de capta IA.'},{property:'og:title',content:'Nueva contraseña — capta IA'},{property:'og:description',content:'Actualiza tu contraseña de forma segura.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]}),component:()=> <AccountForm recovery/>});
