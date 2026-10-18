@@ -1,4 +1,8 @@
 # Functional vertical slice
+## Simple social login
+- [x] Google/Apple buttons, managed preview providers enabled; desktop/mobile UI and 4 session/error rules verified. External v4: 92 tests and Vercel build pass.
+- [ ] External OAuth authorization/return needs owner provider credentials; preview consent not completed, no claim of end-to-end OAuth success.
+- [ ] External workspace read error in screenshot: requires checking deployed schema/grants and runtime logs; not an OAuth failure.
 ## Welcome and non-Google account access
 - [x] Prepare Vercel v3 delivery with profiles SQL and email/SMS setup instructions; 88 external tests and external build pass. Transfer and external settings are user-managed.
 - [ ] Activate phone delivery: UI/code provided, deployment-gated off until user configures paid SMS provider and verifies OTP. Gmail/iCloud work as email addresses, not OAuth buttons.

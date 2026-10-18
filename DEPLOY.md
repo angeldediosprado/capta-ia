@@ -13,7 +13,7 @@ En tu proyecto EXTERNO, abre SQL Editor y ejecuta UNA VEZ el archivo `drizzle/mi
 
 En Authentication → Sign In / Providers activa Email. Mantén Confirm email activado. Ejecuta UNA VEZ `drizzle/migrations/0001_account_profiles.sql` para guardar nombre y empresa; si ya existe profiles, revisa antes su estructura. Este SQL es para tu proyecto externo, no se aplica automáticamente desde Lovable.
 
-Esta versión ofrece correo + contraseña, incluidos Gmail e iCloud como direcciones de correo. No son botones OAuth de Google/Apple. Google no es obligatorio. Para teléfono: activa Phone y configura un proveedor SMS en tu proyecto externo (con costo y límites); solo después añade VITE_PHONE_AUTH_ENABLED=true en Vercel y haz Redeploy. Sin proveedor, teléfono se muestra como no disponible. No hay registro anónimo ni confirmación automática de correo.
+Esta versión ofrece correo + contraseña, incluidos Gmail e iCloud como direcciones de correo. Incluye botones de Google y Apple: activa y configura ambos en Authentication → Sign In / Providers de TU proyecto externo. Google requiere cliente OAuth web; Apple requiere Apple Developer, Services ID y credenciales renovables. Registra el callback que muestra cada proveedor; autoriza la dirección de Vercel terminada en /auth como redirect URL del sitio. Guarda secretos únicamente en ajustes del proveedor, no en VITE_. La activación en Lovable no activa tu proyecto externo. Google no es obligatorio. Para teléfono: activa Phone y configura un proveedor SMS en tu proyecto externo (con costo y límites); solo después añade VITE_PHONE_AUTH_ENABLED=true en Vercel y haz Redeploy. Sin proveedor, teléfono no aparece en el selector principal. No hay registro anónimo ni confirmación automática de correo.
 
 ## 3. Importar en Vercel
 Add New → Project → importa `angeldediosprado/capta-ia`.
@@ -55,10 +55,12 @@ Copia la URL que dé Vercel. En TU Supabase → Authentication → URL Configura
 - Lovable Cloud no se desconecta del proyecto del editor. Esta es una copia externa independiente.
 
 ## Verificación del paquete
-88 pruebas aprobadas. Compilación externa Vercel aprobada: genera `.vercel/output` con funciones y archivos estáticos. Se usaron valores públicos ficticios exclusivamente para compilar, NO incluidos en la entrega. No se comprobó inicio de sesión, guardado ni consulta en TU Supabase/Vercel: requiere su configuración y el primer despliegue. No se ha subido código a GitHub ni publicado desde esta entrega.
+92 pruebas aprobadas. Compilación externa Vercel aprobada: genera `.vercel/output` con funciones y archivos estáticos. Se usaron valores públicos ficticios exclusivamente para compilar, NO incluidos en la entrega. No se comprobó inicio de sesión, guardado ni consulta en TU Supabase/Vercel: requiere su configuración y el primer despliegue. No se ha subido código a GitHub ni publicado desde esta entrega.
 
 ## Búsqueda a comprobar tras actualizar
 En Fuentes selecciona Restaurantes, Colombia y Bogotá. En Dónde buscar elige Turismo Colombia, acepta las condiciones y pulsa Buscar empresas. Comprueba los contactos en Empresas y recarga para confirmar el guardado. Para probar las dos fuentes juntas, busca restaurantes en Pereira y selecciona Turismo Colombia y Cámara de Pereira. El requisito 1 fue verificado aquí para ese piloto (24 + 16 registros); falta comprobarlo en tu Vercel. No se promete segunda fuente de Bogotá ni cobertura universal.
 
 ## Límites verificados de esta entrega
 Bienvenida con logo facetado y Manrope, animación con movimiento reducido, formulario y errores verificados en escritorio y móvil. Sesión existente: búsqueda de 40 empresas en dos fuentes y cierre de sesión comprobados aquí. Alta por correo/confirmación y entrega SMS NO verificados: el servicio de registro de preview rechazó la cuenta de prueba. Confirma registro, recepción de email, perfil creado, recuperación y acceso en tu proyecto externo antes de anunciar que funcionan. Configura SMTP para entrega de correo de producción.
+
+El error de lectura del workspace de la captura no es un error de login: faltan comprobar esquema/permisos y logs de Vercel. No ejecutar de nuevo CREATE TABLE si ya existe. Autorización y retorno reales de Google/Apple externos siguen sin verificar.
