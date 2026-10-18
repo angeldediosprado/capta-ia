@@ -1,17 +1,16 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { useContext, useEffect, useState, type ReactNode } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import { supabase } from '@/lib/backend/client';
 import { loadWorkspace, saveWorkspace, consultSources } from './prospecting.functions';
 import { getProspectingData, setProspectingData, useDataRevision, emptyWorkspace, type Workspace, type ICP } from './data-service';
-interface Actions { user:string|null; busy:boolean; error:string; refresh:()=>Promise<void>; save:(w:Workspace)=>Promise<void>; consult:(icp?:ICP,draftTemplate?:string)=>Promise<Workspace>; setMode:(m:'demo'|'real')=>void }
-const Context=createContext<Actions|null>(null);
+import { ProspectingContext as Context } from './prospecting-context-state';
 export function ProspectingProvider({children}:{children:ReactNode}) {
  const [user,setUser]=useState<string|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const load=useServerFn(loadWorkspace),saveFn=useServerFn(saveWorkspace),consultFn=useServerFn(consultSources);
  async function perform(fn:()=>Promise<void>){setBusy(true);setError('');try{await fn();}catch(e){const message=e instanceof Error?e.message:'Error de conexión';setError(message);throw e;}finally{setBusy(false);}}
  async function refresh(){await perform(async()=>{const r=await load();setProspectingData(r.workspace,r.revision);});}
  async function save(w:Workspace){await perform(async()=>{const current=getProspectingData();const r=await saveFn({data:{workspace:w,revision:current.revision}});sessionStorage.setItem('capta-data-mode','real');setProspectingData(r.workspace,r.revision,'real');});}
- async function consult(icp?:ICP,draftTemplate?:string){let result:Workspace|undefined;await perform(async()=>{const r=await consultFn({data:{revision:getProspectingData().revision,icp,draftTemplate}});sessionStorage.setItem('capta-data-mode','real');setProspectingData(r.workspace,r.revision,'real');result=r.workspace;});if(!result)throw new Error('No se recibió el resultado');return result;}
+ async function consult(icp?:ICP,draftTemplate?:string,sources?:('datasf'|'openmap'|'rnt'|'pereira')[]){let result:Workspace|undefined;await perform(async()=>{const r=await consultFn({data:{revision:getProspectingData().revision,icp,draftTemplate,sources}});sessionStorage.setItem('capta-data-mode','real');setProspectingData(r.workspace,r.revision,'real');result=r.workspace;});if(!result)throw new Error('No se recibió el resultado');return result;}
  useEffect(()=>{
   let disposed=false;
   const apply=(email:string|null)=>{if(disposed)return;setUser(email);if(email)void load().then(r=>{if(!disposed)setProspectingData(r.workspace,r.revision);}).catch(()=>{if(!disposed)setError('No se pudieron cargar los datos guardados');});else setProspectingData(emptyWorkspace(),0,'demo');};

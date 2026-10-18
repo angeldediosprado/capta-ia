@@ -7,6 +7,9 @@ import { workspaceSchema, icpSchema } from './prospecting/schemas';
 import { emptyWorkspace } from './prospecting/types';
 import { validateAttempt } from './prospecting/domain';
 import { fetchDataSF } from './prospecting/sources.server';
+import { fetchOpenMap } from './prospecting/open-map.server';
+import { fetchRNT } from './prospecting/rnt.server';
+import { fetchPereira } from './prospecting/pereira.server';
 import { prepareDrafts } from './prospecting/automation';
 export const loadWorkspace=createServerFn({method:'GET'}).middleware([requireSupabaseAuth]).handler(async({context})=> {
  const {data,error}=await context.supabase.from('prospecting_workspaces').select('payload,revision').eq('user_id',context.userId).maybeSingle(); if(error) throw new Error('No se pudo leer el workspace');
@@ -18,13 +21,18 @@ export const saveWorkspace=createServerFn({method:'POST'}).middleware([requireSu
  if(data.workspace.qualifications.some(q=>q.method==='dapta')) throw new Error('Dapta no conectado');
  const {data:revision,error}=await context.supabase.rpc('save_prospecting_workspace',{expected_revision:data.revision,new_payload:JSON.parse(JSON.stringify(data.workspace)) as Json}); if(error) throw new Error('No se guardó: conflicto o error de persistencia. Actualiza y reintenta.'); return {workspace:data.workspace,revision};
 });
-export const consultSources=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator(input=>z.object({revision:z.number().int().nonnegative(),icp:icpSchema.optional(),draftTemplate:z.string().trim().min(1).max(10000).optional()}).parse(input)).handler(async({data,context})=> {
+export const consultSources=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator(input=>z.object({revision:z.number().int().nonnegative(),icp:icpSchema.optional(),sources:z.array(z.enum(['datasf','openmap','rnt','pereira'])).min(1).max(4).optional(),draftTemplate:z.string().trim().min(1).max(10000).optional()}).parse(input)).handler(async({data,context})=> {
  const {data:row,error}=await context.supabase.from('prospecting_workspaces').select('payload,revision').eq('user_id',context.userId).maybeSingle(); if(error) throw new Error('No se pudo leer el workspace');
  if((row?.revision ?? 0)!==data.revision) throw new Error('Workspace actualizado en otra sesión; actualiza primero');
  const current=row ? workspaceSchema.parse(row.payload) : emptyWorkspace();
  if(data.icp)current.icp={...data.icp,provisional:true};
- const result=await fetchDataSF(current.icp);
- const processed=applySourceResult(current,result);
- const workspace=result.run.status==='success' && data.draftTemplate ? prepareDrafts(processed,data.draftTemplate) : processed;
+ const sources=[...new Set(data.sources??['datasf'])];
+ if(sources.includes('datasf') && ((current.icp.country??'US')!=='US' || current.icp.city.trim().toLowerCase()!=='san francisco'))throw new Error('DataSF solo admite esta búsqueda en San Francisco, Estados Unidos. Elige OpenStreetMap para otras ciudades.');
+ let processed=current; let successful=false;
+ for(const source of sources){
+  const result=source==='pereira'?await fetchPereira(current.icp):source==='rnt'?await fetchRNT(current.icp):source==='openmap'?await fetchOpenMap(current.icp):await fetchDataSF(current.icp);
+  processed=applySourceResult(processed,result); successful=successful||result.run.status==='success';
+ }
+ const workspace=successful && data.draftTemplate ? prepareDrafts(processed,data.draftTemplate) : processed;
  const {data:revision,error:saveError}=await context.supabase.rpc('save_prospecting_workspace',{expected_revision:data.revision,new_payload:JSON.parse(JSON.stringify(workspace)) as Json}); if(saveError) throw new Error('Consulta finalizada pero no guardada; actualiza antes de reintentar'); return {workspace,revision};
 });

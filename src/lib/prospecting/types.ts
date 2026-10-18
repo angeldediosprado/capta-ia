@@ -1,12 +1,12 @@
 import type { StageAudit } from './discovery';
 export type DataClass = 'live' | 'imported' | 'historical' | 'demo';
-export type SourceId = 'datasf' | 'cslb';
+export type SourceId = 'datasf' | 'cslb' | 'openmap' | 'rnt' | 'pereira';
 export type Channel = 'phone' | 'email' | 'web';
 export interface Provenance { source: SourceId; recordId: string; url: string; fetchedAt: string; sourceUpdatedAt?: string | undefined; dataClass: DataClass; attribution: string; query: string; runId: string }
-export interface Lead { id: string; name: string; address?: string | undefined; city?: string | undefined; naics?: string | undefined; classifications: string[]; licenseNumber?: string | undefined; accountId?: string | undefined; active?: boolean | undefined; phone?: string | undefined; email?: string | undefined; website?: string | undefined; createdAt: string; provenance: Provenance[]; review: boolean }
+export interface Lead { id: string; name: string; address?: string | undefined; city?: string | undefined; searchArea?: {city:string;relationId:number;label:string} | undefined; country?: string | undefined; mapSector?: string | undefined; naics?: string | undefined; classifications: string[]; licenseNumber?: string | undefined; accountId?: string | undefined; active?: boolean | undefined; phone?: string | undefined; email?: string | undefined; website?: string | undefined; createdAt: string; provenance: Provenance[]; review: boolean }
 export interface Source { id: SourceId; title: string; url: string; attribution: string; mode: 'live' | 'import'; }
 export interface SourceRun { id: string; source: SourceId; fetchedAt: string; sourceUpdatedAt?: string | undefined; query: string; dataClass: DataClass; filename?: string | undefined; status: 'success' | 'error'; error?: string | undefined; received: number; newUnique: number; merged: number; review: number; url: string; attribution: string; finishedAt?: string | undefined; discarded?: number | undefined; stages?: StageAudit[] | undefined; evaluations?: {leadId:string;status:string;reasons:string[]}[] | undefined; icpSnapshot?: ICP | undefined }
-export interface ICP { provisional: boolean; city: string; naics: string; classifications: string[]; requireActive: boolean; businessType?: string | undefined; requireBusinessType?: boolean | undefined; optionalCriteria?: string | undefined }
+export interface ICP { provisional: boolean; city: string; country?: string | undefined; sector?: string | undefined; requireContact?: boolean | undefined; naics: string; classifications: string[]; requireActive: boolean; businessType?: string | undefined; requireBusinessType?: boolean | undefined; optionalCriteria?: string | undefined }
 export interface ICPEvaluation { status: 'match' | 'no-match' | 'insufficient'; reasons: string[] }
 export interface ContactDraft { id: string; leadId: string; channel: Channel; text: string; date: string }
 export interface ContactAttempt { id: string; leadId: string; channel: Channel; date: string; status: 'attempt-recorded' | 'sent' | 'delivered' | 'failed'; note: string; providerConfirmed: boolean; }
@@ -19,5 +19,8 @@ export const defaultICP: ICP = { provisional: true, city: 'San Francisco', naics
 export const emptyWorkspace = (): Workspace => ({ leads: [], runs: [], icp: { ...defaultICP }, drafts: [], attempts: [], responses: [], costs: [], qualifications: [], agentRuns: [] });
 export const SOURCE_DEFINITIONS: Source[] = [
  { id: 'datasf', title: 'DataSF · Registered Business Locations', url: 'https://data.sfgov.org/resource/g8m3-pdis.json', attribution: 'San Francisco Treasurer & Tax Collector · DataSF; términos: https://datasf.org/opendata/terms-of-use/', mode: 'live' },
- { id: 'cslb', title: 'CSLB · Contractors', url: 'https://www.cslb.ca.gov/OnlineServices/DataPortal/', attribution: 'California Contractors State License Board · archivo público importado por el usuario; sujeto a términos del portal.', mode: 'import' }
+ { id: 'openmap', title: 'OpenStreetMap · empresas públicas', url: 'https://overpass-api.de/api/interpreter', attribution: '© OpenStreetMap contributors · ODbL 1.0 · https://www.openstreetmap.org/copyright', mode: 'live' },
+ { id: 'cslb', title: 'CSLB · Contractors', url: 'https://www.cslb.ca.gov/OnlineServices/DataPortal/', attribution: 'California Contractors State License Board · archivo público importado por el usuario; sujeto a términos del portal.', mode: 'import' },
+ { id: 'rnt', title: 'Turismo Colombia · restaurantes y hoteles', url: 'https://www.datos.gov.co/resource/thwd-ivmp.json', attribution: 'MinCIT · Registro Nacional de Turismo · CC BY-SA 4.0 · https://www.datos.gov.co/d/thwd-ivmp', mode: 'live' },
+ { id: 'pereira', title: 'Cámara de Pereira · sociedades BIC', url: 'https://www.datos.gov.co/resource/hjhn-23mx.json', attribution: 'Cámara de Comercio de Pereira, Risaralda · CC BY-SA 4.0 · https://www.datos.gov.co/d/hjhn-23mx', mode: 'live' }
 ];

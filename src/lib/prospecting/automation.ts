@@ -1,10 +1,12 @@
 import { evaluateICP, validLead } from './domain';
 import type { Channel, ICP, Lead, Workspace } from './types';
+import { mapSectors } from './open-map';
 
 export const discoveryProfiles: { id: string; label: string; icp: ICP }[] = [
   { id: 'hvac', label: 'Climatización y plomería', icp: { provisional: true, city: 'San Francisco', naics: '238220', classifications: ['C-20', 'C-36'], requireActive: true } },
   { id: 'electrical', label: 'Instalaciones eléctricas', icp: { provisional: true, city: 'San Francisco', naics: '238210', classifications: ['C-10'], requireActive: true } },
   { id: 'restaurants', label: 'Restaurantes', icp: { provisional: true, city: 'San Francisco', naics: '722511,722513', classifications: [], requireActive: true } },
+  ...mapSectors.filter(s=>!['hvac','electrical','restaurants'].includes(s.id)).map(s=>({id:s.id,label:s.label,icp:{provisional:true,city:'San Francisco',sector:s.id,naics:s.codes.join(','),classifications:[],requireActive:false,requireContact:true}})),
 ];
 export function publicChannel(lead: Lead): Channel | null {
   return lead.email ? 'email' : lead.phone ? 'phone' : lead.website ? 'web' : null;

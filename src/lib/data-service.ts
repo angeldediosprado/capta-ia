@@ -2,6 +2,7 @@
 import { companies as demoCompanies, contacts as demoContacts, sources as demoSources, signals as demoSignals, rules as demoRules, periodActivity, type Company, type Contact, type Source, type Signal } from './demo-data';
 import { getProspectingData } from './prospecting-store';
 import { evaluateICP } from './prospecting/domain';
+import { mapSectors } from './prospecting/open-map';
 export { useDataRevision, getProspectingData, setProspectingData } from './prospecting-store';
 export { evaluateICP, deduplicate, metrics, validLead } from './prospecting/domain';
 export { SOURCE_DEFINITIONS, emptyWorkspace } from './prospecting/types';
@@ -9,9 +10,9 @@ export type * from './prospecting/types';
 export const IS_DEMO=true;
 export const isDemo=()=>getProspectingData().mode==='demo';
 export const getLeads=()=>getProspectingData().workspace.leads;
-export const getSources=():Source[]=>isDemo()?demoSources:getProspectingData().workspace.runs.map(r=>({id:r.id,title:`${r.source.toUpperCase()} · ${r.filename ?? r.fetchedAt.slice(0,10)}`,type:'Registro',origin:r.url,url:r.url,status:r.status==='error'?'en revisión':'organizado',date:r.fetchedAt.slice(0,10),industry:`NAICS ${getProspectingData().workspace.icp.naics}`,confidence:0}));
+export const getSources=():Source[]=>isDemo()?demoSources:getProspectingData().workspace.runs.map(r=>({id:r.id,title:`${r.source.toUpperCase()} · ${r.filename ?? r.fetchedAt.slice(0,10)}`,type:'Registro',origin:r.url,url:r.url,status:r.status==='error'?'en revisión':'organizado',date:r.fetchedAt.slice(0,10),industry:mapSectors.find(s=>s.id===r.icpSnapshot?.sector)?.label??(r.icpSnapshot?.naics?`Perfil NAICS ${r.icpSnapshot.naics}`:'Actividad no informada'),confidence:0}));
 export const getSource=(id:string)=>getSources().find(s=>s.id===id);
-export const getCompanies=():Company[]=>isDemo()?demoCompanies:getLeads().map(l=>({id:l.id,name:l.name,city:l.city??'Sin ciudad',industry:`NAICS ${getProspectingData().workspace.icp.naics}`,size:'N/D',score:evaluateICP(l,getProspectingData().workspace.icp).status==='match'?100:0,sourceIds:[...new Set(l.provenance.map(p=>p.runId))],signals:[l.review?'Revisión de identidad':evaluateICP(l,getProspectingData().workspace.icp).status]}));
+export const getCompanies=():Company[]=>isDemo()?demoCompanies:getLeads().map(l=>({id:l.id,name:l.name,city:l.city??'Sin ciudad',industry:mapSectors.find(s=>s.id===l.mapSector)?.label??(l.naics?`NAICS ${l.naics}`:'Actividad no informada'),size:'N/D',score:evaluateICP(l,getProspectingData().workspace.icp).status==='match'?100:0,sourceIds:[...new Set(l.provenance.map(p=>p.runId))],signals:[l.review?'Revisión de identidad':evaluateICP(l,getProspectingData().workspace.icp).status]}));
 export const getCompany=(id:string)=>getCompanies().find(c=>c.id===id);
 export const getContacts=():Contact[]=>isDemo()?demoContacts:getLeads().filter(l=>l.phone||l.email||l.website).map(l=>({id:`contact-${l.id}`,name:l.name,role:'Contacto comercial público',companyId:l.id,sourceId:l.provenance[0]?.runId??'',email:l.email??l.phone??l.website??'',addedAt:l.createdAt.slice(0,10)}));
 export const getSignals=():Signal[]=>isDemo()?demoSignals:[...getLeads().map(l=>({id:`found-${l.id}`,date:l.createdAt.slice(0,10),companyId:l.id,sourceId:l.provenance[0]?.runId??'',agent:'scout' as const,kind:'Producto' as const,label:`Registro público adquirido · ${l.name}`})),...getProspectingData().workspace.attempts.map(a=>({id:a.id,date:a.date.slice(0,10),companyId:a.leadId,sourceId:getLeads().find(l=>l.id===a.leadId)?.provenance[0]?.runId??'',agent:'sorter' as const,kind:'Producto' as const,label:`Acción manual · ${a.channel} · ${a.note}`})),...getProspectingData().workspace.responses.map(r=>({id:r.id,date:r.date.slice(0,10),companyId:r.leadId,sourceId:getLeads().find(l=>l.id===r.leadId)?.provenance[0]?.runId??'',agent:'check' as const,kind:'Producto' as const,label:`Respuesta observada · ${r.responder} · ${r.note}`}))];
@@ -41,3 +42,7 @@ export const getPipelineRuns=()=>isDemo()?[]:getProspectingData().workspace.runs
 
 export { sourceCatalog } from './prospecting/catalog';
 export { discoveryProfiles, prepareDrafts, publicChannel } from './prospecting/automation';
+
+export { mapSectors, searchCountries, sectorForICP, openMapQuery, contactCompleteness } from './prospecting/open-map';
+
+export { supportsPereira } from './prospecting/pereira';

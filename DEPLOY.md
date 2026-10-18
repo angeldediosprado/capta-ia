@@ -1,8 +1,8 @@
 # Publicar capta IA en Vercel con tu Supabase
 
-## 1. Llevar esta versión a capta-ia
+## 1. Actualizar tu repositorio capta-ia
 1. Descarga y descomprime este paquete.
-2. En GitHub Desktop: File → Clone repository → URL → `https://github.com/angeldediosprado/capta-ia`.
+2. En GitHub Desktop selecciona el repositorio capta-ia que ya clonaste y usa Repository → Show in Explorer/Finder. No lo clones de nuevo.
 3. Abre la carpeta clonada y copia dentro el contenido del paquete, incluidos `.gitignore` y `.env.example`. NO borres la carpeta `.git` del repositorio clonado.
 4. En GitHub Desktop revisa los cambios, escribe “Preparar capta IA para Vercel”, pulsa Commit to main y Push origin.
 
@@ -55,4 +55,7 @@ Copia la URL que dé Vercel. En TU Supabase → Authentication → URL Configura
 - Lovable Cloud no se desconecta del proyecto del editor. Esta es una copia externa independiente.
 
 ## Verificación del paquete
-51 pruebas aprobadas. Compilación externa Vercel aprobada: genera `.vercel/output` con funciones y archivos estáticos. Se usaron valores públicos ficticios exclusivamente para compilar, NO incluidos en la entrega. No se comprobó inicio de sesión, guardado ni consulta en TU Supabase/Vercel: requiere su configuración y el primer despliegue. No se ha subido código a GitHub ni publicado desde esta entrega.
+84 pruebas aprobadas. Compilación externa Vercel aprobada: genera `.vercel/output` con funciones y archivos estáticos. Se usaron valores públicos ficticios exclusivamente para compilar, NO incluidos en la entrega. No se comprobó inicio de sesión, guardado ni consulta en TU Supabase/Vercel: requiere su configuración y el primer despliegue. No se ha subido código a GitHub ni publicado desde esta entrega.
+
+## Búsqueda a comprobar tras actualizar
+En Fuentes selecciona Restaurantes, Colombia y Bogotá. En Dónde buscar elige Turismo Colombia, acepta las condiciones y pulsa Buscar empresas. Comprueba los contactos en Empresas y recarga para confirmar el guardado. Para probar las dos fuentes juntas, busca restaurantes en Pereira y selecciona Turismo Colombia y Cámara de Pereira. El requisito 1 fue verificado aquí para ese piloto (24 + 16 registros); falta comprobarlo en tu Vercel. No se promete segunda fuente de Bogotá ni cobertura universal.

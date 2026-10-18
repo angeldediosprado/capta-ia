@@ -18,9 +18,9 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/fuentes")({
   validateSearch: z.object({ id: z.string().optional() }),
   head: () => ({ meta: [
-    { title: "Fuentes — capta IA" }, { name: "description", content: "Fuentes detectadas por Scout: tipo, origen, estado y procedencia." },
+    { title: "Fuentes — capta IA" }, { name: "description", content: "Busca empresas en fuentes públicas y revisa el origen de los resultados." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:title", content: "Fuentes — capta IA" }, { property: "og:description", content: "Explora las fuentes de inteligencia comercial." },
+      { property: "og:title", content: "Fuentes — capta IA" }, { property: "og:description", content: "Busca empresas en fuentes públicas con un perfil editable." },
   ] }),
   component: Fuentes,
 });
@@ -70,9 +70,9 @@ function Fuentes() {
   const selected = getSources().find((s) => s.id === id) ?? null;
   return (
     <div className="mx-auto max-w-[1400px]">
-      <PageHeader eyebrow="Scout · Descubre" title="Fuentes" description="Descubrimiento guiado: perfil provisional, fuentes públicas, consulta e importación con trazabilidad." />
+      <PageHeader eyebrow="Scout · Descubre" title="Fuentes" description="Elige qué empresas buscas y de dónde obtenerlas." />
       <SourceControls />
-      <div className="panel p-4">
+      <details className="border-t pt-4"><summary className="cursor-pointer text-sm text-muted-foreground">Ver fuentes consultadas</summary><div className="mt-4 min-w-0">
         <div className="mb-4 flex flex-col gap-3">
           <SearchBar value={q} onChange={setQ} placeholder="Buscar por título, origen o industria" className="max-w-md" />
           <div className="flex flex-wrap gap-x-6 gap-y-2"><FilterChips label="Tipo" options={TYPES} value={type} onChange={setType} /><FilterChips label="Estado" options={STATUSES} value={status} onChange={setStatus} /></div>
@@ -85,6 +85,7 @@ function Fuentes() {
           { key: "d", header: "Fecha", cell: (r) => <span className="font-mono text-xs">{r.date}</span> },
         ]} />
       </div>
+      </details>
       <SourceDetail s={selected} onClose={() => nav({ search: {} })} />
     </div>
   );

@@ -1,0 +1,20 @@
+import {afterEach,describe,it,expect,vi} from 'vitest';
+import {mapPereira,pereiraQuery,supportsPereira} from '../prospecting/pereira';
+import {fetchPereira} from '../prospecting/pereira.server';
+import {emptyWorkspace,defaultICP,type ICP,type SourceRun} from '../prospecting/types';
+import {applySourceResult} from '../prospecting/discovery';
+import {evaluateICP,metrics} from '../prospecting/domain';
+import {workspaceSchema} from '../prospecting/schemas';
+const icp:ICP={...defaultICP,country:'CO',city:'Pereira',sector:'restaurants',requireContact:true,requireActive:false};
+const run:SourceRun={id:'run',source:'pereira',fetchedAt:'2026-10-18T15:00:00Z',query:'CIIU',url:'https://www.datos.gov.co/resource/hjhn-23mx.json',attribution:'Cámara',dataClass:'live',status:'success',received:1,newUnique:0,merged:0,review:0};
+const row={matricula:'001234',razon_social:'Empresa de prueba',dir_comercial:'Calle 10',mun_comercial:'PEREIRA',tel_com:'6061234567',correo_comercial:'ventas@example.org',ciiu:'I5611 ** Expendio a la mesa de comidas preparadas'};
+afterEach(()=>vi.unstubAllGlobals());
+describe('independent useful Pereira source',()=>{
+ it('never presents Risaralda BIC records as Bogotá or universal business coverage',()=>{expect(supportsPereira(icp)).toBe(true);expect(supportsPereira({...icp,city:'Bogotá'})).toBe(false);expect(()=>pereiraQuery({...icp,city:'Bogotá'})).toThrow();expect(pereiraQuery(icp)).toContain("mun_comercial='PEREIRA'");});
+ it('retains business contacts and source identifier without inventing active state or NAICS',()=>{const lead=mapPereira([row],icp,run)[0];expect(lead?.phone).toBe('6061234567');expect(lead?.email).toBe('ventas@example.org');expect(lead?.provenance[0]?.recordId).toBe('001234');expect(lead?.active).toBeUndefined();expect(lead?.naics).toBeUndefined();if(!lead)throw new Error('Missing lead');expect(evaluateICP(lead,icp).status).toBe('match');expect(evaluateICP(lead,{...icp,requireActive:true}).status).toBe('insufficient');});
+ it('requires actual city category address and usable public contact',()=>{for(const change of [{mun_comercial:'BOGOTA'},{ciiu:'I1561 wrong'},{dir_comercial:''},{tel_com:'0',correo_comercial:'juan@example.org'}])expect(mapPereira([{...row,...change}],icp,run)).toEqual([]);});
+ it('does not guess between architecture and engineering from combined CIIU 7110',()=>{const profile={...icp,sector:'architecture'};const lead=mapPereira([{...row,ciiu:'M7110 ** Arquitectura e ingeniería'}],profile,run)[0];if(!lead)throw new Error('Missing lead');expect(evaluateICP(lead,profile).status).toBe('insufficient');});
+ it('preserves source scoped dedup evidence and unknown costs',()=>{const first=applySourceResult({...emptyWorkspace(),icp},{run,leads:mapPereira([row],icp,run)});const nextRun={...run,id:'next'};const second=applySourceResult(first,{run:nextRun,leads:mapPereira([row],icp,nextRun)});expect(second.leads).toHaveLength(1);expect(second.leads[0]?.provenance).toHaveLength(2);expect(workspaceSchema.parse(second).runs[0]?.source).toBe('pereira');expect(metrics(second,'2026-10-18','2026-10-18').sources.find(s=>s.source==='pereira')?.cpl.value).toBeNull();});
+ it('fetches only establishment fields and published update metadata',async()=>{const fetch=vi.fn().mockResolvedValueOnce(new Response(JSON.stringify([row]))).mockResolvedValueOnce(new Response(JSON.stringify({rowsUpdatedAt:1773103595})));vi.stubGlobal('fetch',fetch);const result=await fetchPereira(icp);expect(result.run.status).toBe('success');expect(result.run.sourceUpdatedAt).toContain('2026-03-10');expect(new URL(String(fetch.mock.calls[0]?.[0])).searchParams.get('$select')).not.toContain('identificacion');});
+ it('preserves inventory on source failure without synthetic fallback',async()=>{vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response('',{status:503})));const result=await fetchPereira(icp);expect(result.run.status).toBe('error');expect(result.leads).toEqual([]);expect(applySourceResult({...emptyWorkspace(),icp,leads:mapPereira([row],icp,run)},result).leads).toHaveLength(1);});
+});
